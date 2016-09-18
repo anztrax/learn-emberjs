@@ -22,14 +22,10 @@ Meteor.methods({
       username : Meteor.users.findOne(this.userId).username
     })
   },
-
-  //this is used for remove task
   'tasks.remove'(taskId){
     check(taskId,String);
     Tasks.remove(taskId);
   },
-
-  //this is for set checked
   'tasks.setChecked'(taskId,setChecked){
     check(taskId,String);
     check(setChecked,Boolean);

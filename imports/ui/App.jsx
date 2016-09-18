@@ -10,6 +10,9 @@ import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 /**
  * by default meteor insecure :
  * - meteor remove insecure
+ *
+ * by default meteor is autopublish :
+ * - autopublish package, which automatically synchronizes all of the database contents to the client
  */
 
 class App extends React.Component{
@@ -24,12 +27,7 @@ class App extends React.Component{
     event.preventDefault();
 
     const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
-    Tasks.insert({
-      text,
-      createdAt : new Date(),
-      owner : Meteor.userId(),  //this is userID
-      username : Meteor.user().username  //this is username
-    });
+    Meteor.call('tasks.insert',text);
 
     ReactDOM.findDOMNode(this.refs.textInput).value = '';
   }
