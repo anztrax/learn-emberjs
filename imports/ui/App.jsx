@@ -13,6 +13,7 @@ import AccountsUIWrapper from './AccountsUIWrapper.jsx';
  *
  * by default meteor is autopublish :
  * - autopublish package, which automatically synchronizes all of the database contents to the client
+ * - meteor remove autopublish
  */
 
 class App extends React.Component{
@@ -85,6 +86,8 @@ class App extends React.Component{
 
 //this create container things inject props to App
 export default createContainer(()=>{
+  Meteor.subscribe('tasks');
+
   return {
     tasks : Tasks.find({}, { sort : {createdAt : -1 } }).fetch(),
     incompleteCount : Tasks.find({checked : { $ne : true} }).count(),

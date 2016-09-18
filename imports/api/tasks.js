@@ -4,6 +4,13 @@ import { check } from 'meteor/check';
 
 export const Tasks = new Mongo.Collection('tasks');
 
+//this is use for publish tasks data
+if(Meteor.isServer){
+  Meteor.publish('tasks',function tasksPublications(){
+    return tasks.find();
+  });
+}
+
 //we define method here
 Meteor.methods({
   //this is for insert things
