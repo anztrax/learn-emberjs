@@ -7,8 +7,25 @@ export const Tasks = new Mongo.Collection('tasks');
 //this is use for publish tasks data
 if(Meteor.isServer){
   Meteor.publish('tasks',function tasksPublications(){
-    return tasks.find();
+    return Tasks.find({
+      $or : [
+        {private : { $ne : true}},
+        {owner : this.userId}
+      ]
+    });
   });
+}
+
+function checkIsUserAuthorized(taskId){
+  const task = Tasks.findOne(taskId);
+
+  //make sure only the task owner can make a task private
+  if(task.owner !== this.userId){
+    throw new Meteor.Error('not-authorized');
+    return false;
+  }
+
+  return true;
 }
 
 //we define method here
@@ -26,17 +43,31 @@ Meteor.methods({
       text,
       createdAt : new Date(),
       owner : this.userId,
-      username : Meteor.users.findOne(this.userId).username
+      username : Meteor.users.findOne(this.userId).username,
+      private : true
     })
   },
   'tasks.remove'(taskId){
     check(taskId,String);
-    Tasks.remove(taskId);
+
+    if(checkIsUserAuthorized(taskId)) {
+      Tasks.remove(taskId);
+    }
   },
   'tasks.setChecked'(taskId,setChecked){
     check(taskId,String);
     check(setChecked,Boolean);
 
-    Tasks.update(taskId,{ $set : { checked : setChecked }});
+    if(checkIsUserAuthorized(taskId)) {
+      Tasks.update(taskId,{ $set : { checked : setChecked }});
+    }
+  },
+  'tasks.setPrivate'(taskId,setToPrivate){
+    check(taskId,String);
+    check(setToPrivate,Boolean);
+
+    if(checkIsUserAuthorized(taskId)){
+      Tasks.update(taskId, { $set : { private : setToPrivate }});
+    }
   }
 })
